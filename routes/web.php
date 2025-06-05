@@ -6,8 +6,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/migrate', function () {
-    Artisan::call('migrate');
-    dd('migrated!');
+    try {
+        $exitCode = Artisan::call('migrate', ['--force' => true]);
+        return response()->json([
+            'exitCode' => $exitCode,
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 });
 
 
