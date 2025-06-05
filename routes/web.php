@@ -1,8 +1,14 @@
 <?php
 
 use App\Http\Controllers\DelayController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+Route::get('/migrate', function () {
+    Artisan::call('migrate');
+});
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
