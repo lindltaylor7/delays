@@ -7,6 +7,7 @@ use Inertia\Inertia;
 
 Route::get('/migrate', function () {
     Artisan::call('migrate');
+    dd('migrated!');
 });
 
 
