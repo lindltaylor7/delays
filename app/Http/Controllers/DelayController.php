@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UpdateDelay;
 use App\Models\Delay;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,20 +33,26 @@ class DelayController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the request data
-        $request->validate([
+        $validated = $request->validate([
             'user_id' => 'required|max:255',
             'vehicle' => 'required|string|max:255',
             'reason' => 'nullable|string|max:255',
             'status' => 'required',
         ]);
 
-        $request->merge([
+        $delayData = [
+            'user_id' => $request->user_id,
+            'vehicle' => $request->vehicle,
+            'reason' => $request->reason,
+            'status' => $request->status,
             'start_time' => now(),
-            'end_time' => null, // Set end_time to null initially
-        ]);
+            'end_time' => null,
+        ];
 
-        $delay = Delay::create($request->all());
+        $delay = Delay::create($delayData);
+
+        // Dispara el evento con los datos
+        event(new UpdateDelay($delayData));
 
         return redirect()->route('delay.index')->with('success', 'Demora registrada exitosamente.');
     }
@@ -80,5 +87,10 @@ class DelayController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function admin()
+    {
+        return Inertia::render('admin/Index');
     }
 }

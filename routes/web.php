@@ -16,5 +16,7 @@ Route::get('dashboard', function () {
 Route::get('/delay', [DelayController::class, 'index'])->middleware(['auth', 'verified'])->name('delay.index');
 Route::post('/delay', [DelayController::class, 'store'])->middleware(['auth', 'verified'])->name('delay.store');
 
+
+Route::get('/admin', [DelayController::class, 'admin'])->middleware(['auth', 'verified'])->name('admin.index');
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
