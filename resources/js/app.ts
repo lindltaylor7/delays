@@ -6,26 +6,9 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from 'ziggy-js';
 import { initializeTheme } from './composables/useAppearance';
-import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
+import { configureEcho } from '@laravel/echo-vue'
 
-
-window.Pusher = Pusher;
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: true,
-    encrypted: true,
-    authEndpoint: import.meta.env.VITE_AUTH_ENDPOINT,
-    auth: {
-         headers:{
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-        }
-    }
-});
-
+configureEcho({ broadcaster: 'pusher',})
 
 // Extend ImportMeta interface for Vite...
 declare module 'vite/client' {
