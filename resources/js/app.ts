@@ -18,7 +18,7 @@ window.Echo = new Echo({
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     forceTLS: true,
     encrypted: true,
-    authEndpoint: import.meta.env.VITE_AUTH_ENDPOINT || '/broadcasting/auth',
+    authEndpoint: import.meta.env.VITE_AUTH_ENDPOINT,
     auth: {
          headers:{
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
