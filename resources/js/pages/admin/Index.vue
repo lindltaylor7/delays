@@ -8,7 +8,7 @@ const user = usePage().props.auth.user;
 const notifications = ref([]);
 
 useEcho(`delays.${user.id}`, 'UpdateDelay', (e) => {
-    console.log(e);
+    notifications.value.push(e.data);
 });
 </script>
 
