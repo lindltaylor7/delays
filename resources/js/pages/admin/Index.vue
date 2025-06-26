@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AppLayout from '@/layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import { useEcho } from '@laravel/echo-vue';
 import { computed, ref } from 'vue';
@@ -57,89 +58,91 @@ const calculateDuration = (start, end) => {
 </script>
 
 <template>
-    <div class="delays-container">
-        <!-- Header -->
-        <header class="delays-header">
-            <h1 class="delays-title">Administración de Delays</h1>
-            <div class="delays-controls">
-                <div class="search-box">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 20 20" fill="currentColor">
+    <AppLayout>
+        <div class="w-full px-5">
+            <!-- Header -->
+            <header class="delays-header">
+                <h1 class="delays-title">Administración de Delays</h1>
+                <div class="delays-controls">
+                    <div class="search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                                fill-rule="evenodd"
+                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                        <input v-model="searchQuery" type="text" placeholder="Buscar delays..." class="search-input" />
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button @click="activeTab = 'active'" :class="['tab-btn', { active: activeTab === 'active' }]">
+                    Delays Activos
+                    <span class="badge">{{ delays.filter((d) => d.status !== 'completed').length }}</span>
+                </button>
+                <button @click="activeTab = 'completed'" :class="['tab-btn', { active: activeTab === 'completed' }]">
+                    Histórico
+                    <span class="badge">{{ delays.filter((d) => d.status === 'completed').length }}</span>
+                </button>
+            </div>
+
+            <!-- Delays Table -->
+            <div class="table-container">
+                <div v-if="filteredDelays.length === 0" class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="empty-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path
                             fill-rule="evenodd"
-                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                             clip-rule="evenodd"
                         />
                     </svg>
-                    <input v-model="searchQuery" type="text" placeholder="Buscar delays..." class="search-input" />
+                    <p>No hay delays {{ activeTab === 'active' ? 'activos' : 'completados' }}</p>
                 </div>
+
+                <table v-else class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Vehículo</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Duración</th>
+                            <th>Estado</th>
+                            <th>Motivo</th>
+                            <th>Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="delay in delays" :key="delay.id">
+                            <td>{{ delay.user_id }}</td>
+                            <td>{{ delay.vehicle }}</td>
+                            <td>{{ formatDateTime(delay.start_time) }}</td>
+                            <td>{{ formatDateTime(delay.end_time) }}</td>
+                            <td>{{ calculateDuration(delay.start_time, delay.end_time) }}</td>
+                            <td>
+                                <span :class="['status-badge', statusClasses[delay.status]]">
+                                    {{
+                                        delay.status === 'pending'
+                                            ? 'Pendiente'
+                                            : delay.status === 'in_progress'
+                                              ? 'En progreso'
+                                              : delay.status === 'paused'
+                                                ? 'Pausado'
+                                                : 'Completado'
+                                    }}
+                                </span>
+                            </td>
+                            <td>{{ delay.reason || 'N/A' }}</td>
+                            <td>{{ delay.user_id }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </header>
-
-        <!-- Tabs -->
-        <div class="tabs-container">
-            <button @click="activeTab = 'active'" :class="['tab-btn', { active: activeTab === 'active' }]">
-                Delays Activos
-                <span class="badge">{{ delays.filter((d) => d.status !== 'completed').length }}</span>
-            </button>
-            <button @click="activeTab = 'completed'" :class="['tab-btn', { active: activeTab === 'completed' }]">
-                Histórico
-                <span class="badge">{{ delays.filter((d) => d.status === 'completed').length }}</span>
-            </button>
         </div>
-
-        <!-- Delays Table -->
-        <div class="table-container">
-            <div v-if="filteredDelays.length === 0" class="empty-state">
-                <svg xmlns="http://www.w3.org/2000/svg" class="empty-icon" viewBox="0 0 20 20" fill="currentColor">
-                    <path
-                        fill-rule="evenodd"
-                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                        clip-rule="evenodd"
-                    />
-                </svg>
-                <p>No hay delays {{ activeTab === 'active' ? 'activos' : 'completados' }}</p>
-            </div>
-
-            <table v-else class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Vehículo</th>
-                        <th>Inicio</th>
-                        <th>Fin</th>
-                        <th>Duración</th>
-                        <th>Estado</th>
-                        <th>Motivo</th>
-                        <th>Usuario</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="delay in delays" :key="delay.id">
-                        <td>{{ delay.user_id }}</td>
-                        <td>{{ delay.vehicle }}</td>
-                        <td>{{ formatDateTime(delay.start_time) }}</td>
-                        <td>{{ formatDateTime(delay.end_time) }}</td>
-                        <td>{{ calculateDuration(delay.start_time, delay.end_time) }}</td>
-                        <td>
-                            <span :class="['status-badge', statusClasses[delay.status]]">
-                                {{
-                                    delay.status === 'pending'
-                                        ? 'Pendiente'
-                                        : delay.status === 'in_progress'
-                                          ? 'En progreso'
-                                          : delay.status === 'paused'
-                                            ? 'Pausado'
-                                            : 'Completado'
-                                }}
-                            </span>
-                        </td>
-                        <td>{{ delay.reason || 'N/A' }}</td>
-                        <td>{{ delay.user_id }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    </AppLayout>
 </template>
 
 <style scoped>
