@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Delay extends Model
 {
     protected $fillable = [
-        'vehicle',
+        'vehicle_id',
         'start_time',
         'end_time',
-        'reason',
+        'reason_id',
         'status',
         'user_id',
     ];
@@ -23,5 +23,15 @@ class Delay extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class);
+    }
+
+    public function reason()
+    {
+        return $this->belongsTo(Reason::class);
     }
 }

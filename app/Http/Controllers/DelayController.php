@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Events\UpdateDelay;
 use App\Models\Delay;
+use App\Models\Reason;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -17,6 +19,8 @@ class DelayController extends Controller
         return Inertia::render('delay/Index', [
             'title' => 'Demoras',
             'description' => 'Aqui se registran las demoras.',
+            'vehicles' => Vehicle::all(),
+            'reasons' => Reason::all(),
         ]);
     }
 
@@ -33,17 +37,17 @@ class DelayController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        /* $validated = $request->validate([
             'user_id' => 'required|max:255',
             'vehicle' => 'required|string|max:255',
             'reason' => 'nullable|string|max:255',
             'status' => 'required',
-        ]);
+        ]); */
 
         $delayData = [
             'user_id' => $request->user_id,
-            'vehicle' => $request->vehicle,
-            'reason' => $request->reason,
+            'vehicle_id' => $request->vehicle_id,
+            'reason_id' => $request->reason_id,
             'status' => $request->status,
             'start_time' => now(),
             'end_time' => null,
@@ -76,9 +80,14 @@ class DelayController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update($id)
     {
-        //
+        $delay = Delay::findOrFail($id);
+
+        $delay->end_time = now();
+        $delay->save();
+
+        return redirect()->route('admin.index')->with('success', 'Demora actualizada exitosamente.');
     }
 
     /**
@@ -91,6 +100,13 @@ class DelayController extends Controller
 
     public function admin()
     {
-        return Inertia::render('admin/Index');
+        return Inertia::render(
+            'admin/Index',
+            [
+                'delays' => Delay::with(['vehicle', 'reason', 'user'])
+                    ->orderBy('created_at', 'desc')
+                    ->get(),
+            ]
+        );
     }
 }

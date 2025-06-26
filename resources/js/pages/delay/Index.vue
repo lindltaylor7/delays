@@ -15,16 +15,18 @@ const props = defineProps({
     },
     vehicles: {
         type: Array,
-        default: () => ['Vehículo 1', 'Vehículo 2', 'Vehículo 3'],
+    },
+    reasons: {
+        type: Array,
     },
 });
 
 const form = useForm({
     status: 0,
-    vehicle: '',
+    vehicle_id: 0,
     start_time: '',
     end_time: '',
-    reason: '',
+    reason_id: 0,
     user_id: 0,
 });
 
@@ -32,11 +34,11 @@ const showReasonDialog = ref(false);
 const selectedAction = ref('');
 
 const registerDelay = (delayType: number) => {
-    if (delayType !== 3) {
+    /* if (delayType !== 3) {
         selectedAction.value = delayType === 1 ? 'Iniciar Demora' : delayType === 2 ? 'Reanudar Demora' : 'Pausar Demora';
         showReasonDialog.value = true;
         return;
-    }
+    } */
 
     confirmAction(delayType);
 };
@@ -85,12 +87,28 @@ const confirmAction = (delayType: number) => {
                     >
                     <select
                         id="vehicle"
-                        v-model="form.vehicle"
+                        v-model="form.vehicle_id"
                         style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; color: #000"
                     >
                         <option value="" disabled>Seleccione un vehículo</option>
-                        <option v-for="(vehicle, index) in vehicles" :key="index" :value="vehicle">
-                            {{ vehicle }}
+                        <option v-for="(vehicle, index) in props.vehicles" :key="index" :value="vehicle.id">
+                            {{ vehicle.code }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="reason-selector" style="margin-bottom: 1rem">
+                    <label for="reason" style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem"
+                        >Motivo</label
+                    >
+                    <select
+                        id="vehicle"
+                        v-model="form.reason_id"
+                        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; color: #000"
+                    >
+                        <option value="" disabled>Seleccione un vehículo</option>
+                        <option v-for="(reason, index) in props.reasons" :key="index" :value="reason.id">
+                            {{ reason.description }}
                         </option>
                     </select>
                 </div>

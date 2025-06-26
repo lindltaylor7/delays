@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('delays', function (Blueprint $table) {
             $table->id();
-            $table->string('vehicle');
+            $table->unsignedBigInteger('vehicle_id');
+            $table->foreign('vehicle_id')->references('id')->on('vehicles');
             $table->dateTime('start_time');
             $table->dateTime('end_time')->nullable();
-            $table->string('reason')->nullable();
+            $table->unsignedBigInteger('reason_id');
+            $table->foreign('reason_id')->references('id')->on('reasons');
             $table->string('status')->default('pending');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');

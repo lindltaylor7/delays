@@ -22,6 +22,6 @@ class UpdateDelay implements ShouldBroadcast
     public function broadcastOn()
     {
         // Canal privado para el usuario específico
-        return new PrivateChannel('delays.' . $this->data['user_id']);
+        return new PrivateChannel('delays');
     }
 }

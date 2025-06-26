@@ -1,14 +1,24 @@
 <script setup lang="ts">
+import Button from '@/components/ui/button/Button.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import { usePage } from '@inertiajs/vue3';
+import { useForm, usePage } from '@inertiajs/vue3';
 import { useEcho } from '@laravel/echo-vue';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 const user = usePage().props.auth.user;
 
-const delays = ref([]);
+const delaysCopy = ref([]);
 const activeTab = ref('active');
 const searchQuery = ref('');
+
+const props = defineProps({
+    delays: {
+        type: Array,
+        default: () => [],
+    },
+});
+
+delaysCopy.value = props.delays;
 
 // Mapeo de status numérico a texto
 const statusMap = {
@@ -18,20 +28,8 @@ const statusMap = {
     3: 'completed',
 };
 
-useEcho(`delays.${user.id}`, 'UpdateDelay', (e) => {
-    delays.value.push(e.data);
-});
-
-const filteredDelays = computed(() => {
-    const tabFiltered =
-        activeTab.value === 'active' ? delays.value.filter((d) => d.status !== 'completed') : delays.value.filter((d) => d.status === 'completed');
-
-    return tabFiltered.filter((delay) => {
-        return (
-            delay.vehicle.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-            delay.reason?.toLowerCase().includes(searchQuery.value.toLowerCase())
-        );
-    });
+useEcho('delays', 'UpdateDelay', (e) => {
+    delaysCopy.value.push(e.data);
 });
 
 const statusClasses = {
@@ -45,6 +43,14 @@ const formatDateTime = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleString();
+};
+
+const form = useForm({});
+
+const endDelay = (delayId) => {
+    form.get(route('delay.update', delayId), {
+        onFinish: () => form.reset(),
+    });
 };
 
 const calculateDuration = (start, end) => {
@@ -91,7 +97,7 @@ const calculateDuration = (start, end) => {
 
             <!-- Delays Table -->
             <div class="table-container">
-                <div v-if="filteredDelays.length === 0" class="empty-state">
+                <div v-if="delaysCopy.length === 0" class="empty-state">
                     <svg xmlns="http://www.w3.org/2000/svg" class="empty-icon" viewBox="0 0 20 20" fill="currentColor">
                         <path
                             fill-rule="evenodd"
@@ -113,12 +119,13 @@ const calculateDuration = (start, end) => {
                             <th>Estado</th>
                             <th>Motivo</th>
                             <th>Usuario</th>
+                            <th>Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="delay in delays" :key="delay.id">
+                        <tr v-for="delay in delaysCopy" :key="delay.id">
                             <td>{{ delay.user_id }}</td>
-                            <td>{{ delay.vehicle }}</td>
+                            <td>{{ delay.vehicle.code }}</td>
                             <td>{{ formatDateTime(delay.start_time) }}</td>
                             <td>{{ formatDateTime(delay.end_time) }}</td>
                             <td>{{ calculateDuration(delay.start_time, delay.end_time) }}</td>
@@ -135,8 +142,9 @@ const calculateDuration = (start, end) => {
                                     }}
                                 </span>
                             </td>
-                            <td>{{ delay.reason || 'N/A' }}</td>
-                            <td>{{ delay.user_id }}</td>
+                            <td>{{ delay.reason.description || 'N/A' }}</td>
+                            <td>{{ delay.user.name }}</td>
+                            <td><Button @click="endDelay(delay.id)">Finalizar demora</Button></td>
                         </tr>
                     </tbody>
                 </table>
