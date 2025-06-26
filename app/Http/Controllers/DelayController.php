@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Events\UpdateDelay;
+use App\Exports\DelaysExport;
 use App\Models\Delay;
 use App\Models\Reason;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DelayController extends Controller
 {
@@ -108,5 +110,10 @@ class DelayController extends Controller
                     ->get(),
             ]
         );
+    }
+
+    public function export()
+    {
+        return Excel::download(new DelaysExport, 'demoras.xlsx');
     }
 }

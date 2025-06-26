@@ -53,6 +53,10 @@ const endDelay = (delayId) => {
     });
 };
 
+const exportExcel = () => {
+    form.get(route('delay.export'));
+};
+
 const calculateDuration = (start, end) => {
     if (!start) return 'N/A';
     const endTime = end ? new Date(end) : new Date();
@@ -70,6 +74,7 @@ const calculateDuration = (start, end) => {
             <header class="delays-header">
                 <h1 class="delays-title">Administración de Delays</h1>
                 <div class="delays-controls">
+                    <a href="/delay-export" class="btn btn-primary">Exportar Excel</a>
                     <div class="search-box">
                         <svg xmlns="http://www.w3.org/2000/svg" class="search-icon" viewBox="0 0 20 20" fill="currentColor">
                             <path
