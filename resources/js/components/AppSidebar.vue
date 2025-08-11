@@ -24,6 +24,11 @@ const mainNavItems: NavItem[] = [
         href: '/delay',
         icon: LayoutGrid,
     },
+    {
+        title: 'Perforadoras',
+        href: '/drill',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

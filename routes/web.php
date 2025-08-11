@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DelayController;
+use App\Http\Controllers\DrillController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,6 +32,9 @@ Route::get('/delay', [DelayController::class, 'index'])->middleware(['auth', 've
 Route::post('/delay', [DelayController::class, 'store'])->middleware(['auth', 'verified'])->name('delay.store');
 Route::get('/delay/{id}', [DelayController::class, 'update'])->middleware(['auth', 'verified'])->name('delay.update');
 Route::get('/delay-export', [DelayController::class, 'export'])->middleware(['auth', 'verified'])->name('delay.export');
+
+Route::get('/drill', [DrillController::class, 'index'])->middleware(['auth', 'verified'])->name('drill.index');
+Route::post('/drill', [DrillController::class, 'store'])->middleware(['auth', 'verified'])->name('drill.store');
 
 Route::get('/admin', [DelayController::class, 'admin'])->middleware(['auth', 'verified'])->name('admin.index');
 
