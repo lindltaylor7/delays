@@ -67,9 +67,6 @@ function addRow() {
                     <label>Alt. Verif.</label>
                     <input type="number" step="0.1" v-model="row.verified_ht" />
                 </div>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group half">
                     <label>Tipos de Taladro</label>
                     <select v-model="row.drill_types">
@@ -116,7 +113,7 @@ function addRow() {
             <div class="form-row">
                 <div class="form-group">
                     <label>Comentarios</label>
-                    <input v-model="row.comments" />
+                    <input v-model="row.comments" class="w-50" />
                 </div>
             </div>
         </div>
